@@ -1,0 +1,38 @@
+element,name,desc
+1A,Define study goals,"Define the objective(s) of the NTA study, including the possible hypothesis or research question."
+1B,Define study scope/limitations,"Define the scope of the study and potential limitations, including the domain of applicability of the study."
+2A,Describe sample space(s),Describe the types of samples and properties of samples that you intend on investigating.
+2B,Define sampling plan,"Define the objective(s) of the NTA study, including the possible hypothesis or research question."
+3A,Define QC spikes,Describe the composition of the spike solution used for quality control and performance evaluation.
+3B,Define QC samples,Describe the characteristics and composition of the (uspiked) matrix samples used for quality control and performance evaluation.
+3C,Define blanks,Describe the characteristics and conditions for creating the blanks used for quality control and performance evaluations.
+3D,Define calibration standards (qualitative & quantitative),"Describe the compostion of the calibration standards used for qualitative and quantitative measurements, including quantitative non-targeted analysis (qNTA) approaches."
+3E,Describe application of QC spikes,Describe how the QC spike solutions will be used to determine performance and quality control.
+3F,Describe application of QC samples,Describe how the QC samples will be used to determine performance and quality control.
+3G,Describe application of blanks,Describe how the blanks will be used to determine performance and quality control.
+3H,Describe application of calibration standards,"Using the calibration standards, what will you measure, how will it be calculated and what are the expected boundaries of those metrics?"
+4A,Describe sample preparation method,element description
+4B,Describe analytical sequence design,"Determine the structure of the analytical sequence including randomization, quality control frequency, and sample replication."
+4C,Determine single vs. multiple batch approach,Identify if the study will include a single analytical sequence (batch) or multiple batches and how to incorporate data from multiple batches.
+4D,Define all chromatography settings,Define all parameters for the chromatography of the analytical method.
+4E,Define all mass spectrometry settings,Define all parameters for the mass spectrometry of the analytical method.
+4F,Define instrument calibration/system suitability protocols,element description
+5A,Identify software(s) for data processing,"Determine the software that will be used to pre-process raw data, analyze processed data, and perform statistical analysis"
+5B,Describe data pre-processing workflow,Describe the data pre-processing or treatment steps used prior to analyzing the data.
+5C,Design statistical or chemometric analysis approach,Determine the statistical or chemical analysis and parameters used for the approach.
+5D,Define blank and QC sample processing protocols,Describe the protocols that will be used for processing the blank samples and QC samples and using the blank samples and QC samples for feature detection.
+5E,Describe annotation & identification workflow,Describe the process for which features are annotated or identified after the data has been processed.
+5F,Describe qNTA protocol,"Define types of data that will be generated and how data will be collected, stored, and shared."
+5G,Define data management plan,Describe the protocols that will be used to perform quantitative analysis.
+6A,Define QA/QC protocols (sample preparation),Define the protocols used for evaluating the quality of the sample preparation method of the study.
+6B,Define QA/QC protocols (data acquisition),Define the protocols used for evaluating the quality of the data acquisition step of the study.
+6C,Establish criteria for QA/QC (sample preparation),Determine the performance boundaries for the quality control metrics of the sample preparation method.
+6D,Establish criteria for QA/QC (data acquisition),Determine the performance boundaries for the quality control metrics of the sample preparation method.
+6E,Describe chemical space evaluation protocol,Define protocols used for evaluating and reporting the chemical space of your whole method.
+6F,Define application of standards,Define protocols used for the use of standards within your whole method.
+6G,Determine QA/QC criteria deviation handling procedure,Explain how data that exists outside of the QA/QC boundaries will be handled.
+7A,Define QA/QC protocols (data processing),Define the protocols used for evaluating the quality of the data processing of the study.
+7B,Define QA/QC protocols (annotation & identification),Define the protocols used for evaluating the quality of the chemical annotation and/or identification workflow of the study.
+7C,Establish acceptable QA/QC criteria (data processing),Determine the performance boundaries for the quality control metrics of the data pre-processing and processing method.
+7D,Establish acceptable QA/QC criteria (annotation & identification),Determine the performance boundaries for the quality control metrics of theannotation & identification workflow.
+7E,Determine QA/QC criteria deviation handling procedure,Explain how data that exists outside of the QA/QC boundaries will be handled.
