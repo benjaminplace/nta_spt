@@ -1,7 +1,7 @@
 
 
 #Import required packages
-packs <- c("shiny", "shinydashboard", "shinyalert", "shinyBS")
+packs <- c("shiny", "shinydashboard", "shinyalert", "shinyBS", "knitr", "rmarkdown")
 
 installed_packages <- installed.packages()
 

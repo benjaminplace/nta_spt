@@ -4,6 +4,9 @@
 library(shiny)
 library(shinydashboard)
 library(shinyalert)
+library(rmarkdown)
+library(knitr)
+
 source('app_fn.R')
 input_values <- read.csv('input_values.csv')
 element_values <- read.csv('element_values.csv')
@@ -49,20 +52,24 @@ shinyServer(function(input, output, session) {
   
   observeEvent(input$examples, {
     reacts$examplechoice <- switch(input$examples,
-           "1) Contaminated food" = 1, "2) Polluted river" = 2, "3) Human exposure" = 3
+           "1) Contaminated food" = 1, "2) Polluted river" = 2, "3) Human exposure" = 3, "Additional Information" = 4
            )
   })
   
   output$sop_export <- downloadHandler(
     filename = function() {
-      paste0("SPT_SOPFormat_", Sys.Date(), ".csv")
+      paste0("SPT_SOPFormat_", Sys.Date(), ".docx")
     },
     content = function(file) {
       input_table <- input_values[,c("element", "name", "desc")]
       element_names <- sapply(1:nrow(input_table), function(x) element_values$name[which(element_values$element == input_table$element[x])])
-      input_data <- sapply(input_table$name, function(y) input[[y]])
-      output_table <- cbind(element = input_table$element, element_name = element_names, id = input_table$name, description = input_table$desc, input = input_data)
-      write.csv(output_table, file, row.names = FALSE)
+      input_data <- sapply(input_table$name, function(y) paste(input[[y]], collapse = ", "))
+      dat <- data.frame(element = input_table$element, element_name = element_names, id = input_table$name, description = input_table$desc, input = input_data)
+      rownames(dat) <- dat$id
+      outputfile <- rmarkdown::render('template/sop_template.Rmd', 
+                                      output_file = "test_output.docx", 
+                                      params = list(dat = dat))
+      file.copy(outputfile, file)
     }
   )
   
@@ -78,6 +85,8 @@ shinyServer(function(input, output, session) {
       write.csv(output_table, file, row.names = FALSE)
     }
   )
+  
+  observeEvent(input$browser, {browser()})
   
   
   # for (k in 1:nrow(input_values)) {

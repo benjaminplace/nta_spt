@@ -5,6 +5,7 @@ library(shiny)
 library(shinydashboard)
 library(shinyalert)
 library(shinyBS)
+library(rmarkdown)
 
 # Define header
 header <- dashboardHeader(title = "NTA-SPT")
@@ -21,8 +22,9 @@ sidebar <- dashboardSidebar(
   menuItem("Data Processing", tabName = "dataproc", icon = icon("computer", lib = "font-awesome")),
   menuItem("QA/QC", tabName = "qaqc", icon = icon("list-check", lib = "font-awesome")),
   menuItem("Export SMRT", tabName = "export", icon = icon("download", lib = "font-awesome")),
-  selectInput("examples",label = "Load Example", choices = c("1) Contaminated food", "2) Polluted river", "3) Human exposure"), selected = NULL),
+  selectInput("examples",label = "Load", choices = c("Additional Information", "1) Contaminated food", "2) Polluted river", "3) Human exposure"), selected = NULL),
   actionButton("user_guide", label = "Launch User Guide"),
+  actionButton("browser", label = "Browser"),
   htmlOutput("progress")
   )
 )
