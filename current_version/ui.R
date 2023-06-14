@@ -18,7 +18,7 @@ sidebar <- dashboardSidebar(
   menuItem("Background and Objectives", tabName = "background", icon = icon("scroll", lib = "font-awesome")),
   menuItem("Sample Information", tabName = "samples", icon = icon("glass-water", lib = "font-awesome")),
   menuItem("Standards and Controls", tabName = "standards",icon = icon("flask", lib = "font-awesome")),
-  menuItem("Analytical Method", tabName = "method", icon = icon("microscope", lib = "font-awesome")),
+  menuItem("Data Acquisition", tabName = "method", icon = icon("microscope", lib = "font-awesome")),
   menuItem("Data Processing", tabName = "dataproc", icon = icon("computer", lib = "font-awesome")),
   menuItem("QA/QC", tabName = "qaqc", icon = icon("list-check", lib = "font-awesome")),
   menuItem("Export SMRT", tabName = "export", icon = icon("download", lib = "font-awesome")),
@@ -37,8 +37,9 @@ body <- dashboardBody(
             p("This is where about information will go")
             ),
     tabItem(tabName = "export",
-            fluidRow(downloadButton(outputId = "sop_export", label = "Download data in a SOP format", icon = icon("file-download", verify_fa = FALSE))),
-            fluidRow(downloadButton(outputId = "plan_export", label = "Download data in a Study Plan format", icon = icon("file-download", verify_fa = FALSE)))
+            #fluidRow(downloadButton(outputId = "sop_export", label = "Download data in a SOP format", icon = icon("file-download", verify_fa = FALSE))),
+            #fluidRow(downloadButton(outputId = "plan_export", label = "Download data in a Study Plan format", icon = icon("file-download", verify_fa = FALSE))),
+            fluidRow(downloadButton(outputId = "raw_export", label = "Download raw data as a JSON", icon = icon("file-download", verify_fa = FALSE)))
             ),
     tabItem(tabName = "examples",
             h2("Example Study Designs"),
@@ -54,29 +55,19 @@ body <- dashboardBody(
             ))
       ),
     tabItem(tabName = "background",
-            fluidRow(uiOutput("element_1A"), uiOutput("example_1A")),
-            fluidRow(uiOutput("element_1B"), uiOutput("example_1B"))
+            fluidRow(uiOutput("element_1A"), uiOutput("example_1A"))
     ),
     tabItem(tabName = "samples",
             fluidRow(uiOutput("element_2A"), uiOutput("example_2A")),
             fluidRow(uiOutput("element_2B"), uiOutput("example_2B"))
     ),
     tabItem(tabName = "standards",
-            fluidRow(uiOutput("element_3A"), uiOutput("example_3A")),
-            fluidRow(uiOutput("element_3B"), uiOutput("example_3B")),
-            fluidRow(uiOutput("element_3C"), uiOutput("example_3C")),
-            fluidRow(uiOutput("element_3D"), uiOutput("example_3D")),
-            fluidRow(uiOutput("element_3F"), uiOutput("example_3F")),
-            fluidRow(uiOutput("element_3G"), uiOutput("example_3G")),
-            fluidRow(uiOutput("element_3H"), uiOutput("example_3H"))
+            fluidRow(uiOutput("element_3A"), uiOutput("example_3A"))
     ),
     tabItem(tabName = "method",
             fluidRow(uiOutput("element_4A"), uiOutput("example_4A")),
             fluidRow(uiOutput("element_4B"), uiOutput("example_4B")),
-            fluidRow(uiOutput("element_4C"), uiOutput("example_4C")),
-            fluidRow(uiOutput("element_4D"), uiOutput("example_4D")),
-            fluidRow(uiOutput("element_4E"), uiOutput("example_4E")),
-            fluidRow(uiOutput("element_4F"), uiOutput("example_4F"))
+            fluidRow(uiOutput("element_4C"), uiOutput("example_4C"))
     ),
     tabItem(tabName = "dataproc",
             fluidRow(uiOutput("element_5A"), uiOutput("example_5A")),
@@ -84,22 +75,11 @@ body <- dashboardBody(
             fluidRow(uiOutput("element_5C"), uiOutput("example_5C")),
             fluidRow(uiOutput("element_5D"), uiOutput("example_5D")),
             fluidRow(uiOutput("element_5E"), uiOutput("example_5E")),
-            fluidRow(uiOutput("element_5F"), uiOutput("example_5F")),
-            fluidRow(uiOutput("element_5G"), uiOutput("example_5G"))
+            fluidRow(uiOutput("element_5F"), uiOutput("example_5F"))
     ),
     tabItem(tabName = "qaqc",
             fluidRow(uiOutput("element_6A"), uiOutput("example_6A")),
-            fluidRow(uiOutput("element_6B"), uiOutput("example_6B")),
-            fluidRow(uiOutput("element_6C"), uiOutput("example_6C")),
-            fluidRow(uiOutput("element_6D"), uiOutput("example_6D")),
-            fluidRow(uiOutput("element_6E"), uiOutput("example_6E")),
-            fluidRow(uiOutput("element_6F"), uiOutput("example_6F")),
-            fluidRow(uiOutput("element_6G"), uiOutput("example_6G")),
-            fluidRow(uiOutput("element_7A"), uiOutput("example_7A")),
-            fluidRow(uiOutput("element_7B"), uiOutput("example_7B")),
-            fluidRow(uiOutput("element_7C"), uiOutput("example_7C")),
-            fluidRow(uiOutput("element_7D"), uiOutput("example_7D")),
-            fluidRow(uiOutput("element_7E"), uiOutput("example_7E"))
+            fluidRow(uiOutput("element_6B"), uiOutput("example_6B"))
         )
 )
 )

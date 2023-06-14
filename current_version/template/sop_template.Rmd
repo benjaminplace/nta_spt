@@ -46,11 +46,7 @@ ind <- grep("3[[:alpha:]]_", rownames(dat))
 knitr::kable(dat[ind,c("description", "input")])
 ```
 
-## Sample Preparation
-
-Some sort of split of variables here
-
-## Analytical Method
+## Data Aquisition
 
 The following variables are available
 
@@ -79,10 +75,5 @@ knitr::kable(dat[ind,c("description", "input")])
 ```
 
 The following variables are available
-
-```{r echo=FALSE}
-ind <- grep("7[[:alpha:]]_", rownames(dat))
-knitr::kable(dat[ind,c("description", "input")])
-```
 
 ## Results Reporting

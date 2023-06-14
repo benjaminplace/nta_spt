@@ -1,6 +1,7 @@
 library(shiny)
 library(shinydashboard)
 library(shinyalert)
+library(DT)
 
 dynamic_input_fn <- function(name, desc, type, value, restrict = NULL, width = "100%", multiple = FALSE) {
   returnfn <- NULL
@@ -22,5 +23,50 @@ dynamic_input_fn <- function(name, desc, type, value, restrict = NULL, width = "
   if (type == "list") {
     returnfn <- selectizeInput(inputId = name, label = desc, choices = unlist(strsplit(value, split = ";")), width = width, multiple = multiple)
   }
+  if (type == "list create") {
+    returnfn <- selectizeInput(inputId = name, 
+                               label = desc, 
+                               choices = unlist(strsplit(value, split = ";")), 
+                               width = width, 
+                               multiple = multiple,
+                               options = list(create = TRUE))
+  }
+  if (type == "list matrix") {
+    val <- unlist(strsplit(value, split = "!"))
+    val <- val[1]
+    returnfn <- list(
+      selectizeInput(inputId = name,
+                     label = desc,
+                     choices = unlist(strsplit(val, split = ";")), 
+                     width = width, 
+                     multiple = multiple,
+                     options = list(create = TRUE)),
+      DT::DTOutput(outputId = paste0("table_",name))
+    )
+  }
+  if (type == "modal table") {
+    returnfn <- list(
+      p(desc),
+      actionButton(paste0("add_", name), "Add Value"),
+      actionButton(paste0("remove_", name), "Remove Value"),
+      DT::DTOutput(outputId = paste0("table_", name)),
+      br()
+    )
+  }
   returnfn
+}
+
+dynamic_modal <- function(title, name, inputs, helps, ok = "Add value", size = "xl") {
+  inputs <- unlist(strsplit(inputs, split = ";"))
+  helps <- unlist(strsplit(helps, split = ";"))
+  modalDialog(
+    title = title,
+    size = size,
+    easyClose = TRUE,
+    lapply(1:length(inputs), function(x)
+    fluidRow(
+      textInput(inputId = paste0("modal_", name, inputs[x]), inputs[x]), p(helps[x])
+    )),
+    footer = tagList(actionButton(paste0("modal_ok_", name), ok), modalButton("Cancel"))
+  )
 }
