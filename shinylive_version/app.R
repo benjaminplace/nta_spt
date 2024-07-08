@@ -1,0 +1,1109 @@
+library(shiny)
+library(shinydashboard)
+library(shinyalert)
+library(shinyBS)
+library(rmarkdown)
+library(DT)
+
+#In-App Datasets
+
+input_values <- data.frame(rbind(
+  c(	"1A",	"1A_1",	"Study type and objective",	"Define the goal of the study, including the specific study objectives, hypotheses, and/or questions intended to be addressed by the study. For more examples, go to Table 1.1 at: https://nontargetedanalysis.org/reference-content/methods/study-design/#objectives-and-scope",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Define the goal of the study, including the specific study objectives, hypotheses, and/or questions intended to be addressed by the study. For more examples, go to Table 1.1 at: https://nontargetedanalysis.org/reference-content/methods/study-design/#objectives-and-scope"	),
+  c(	"1A",	"1A_2",	"Study purpose",	"State the intended scope of the study. For example, this can include: hypothesis generation, sample exploration or chemical discovery, investigation of a specific research question, or investigation of questions with legal or other regulatory implications. For more examples, go to Table 1.1 at: https://nontargetedanalysis.org/reference-content/methods/study-design/#objectives-and-scope",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State the intended scope of the study. For example, this can include: hypothesis generation, sample exploration or chemical discovery, investigation of a specific research question, or investigation of questions with legal or other regulatory implications. For more examples, go to Table 1.1 at: https://nontargetedanalysis.org/reference-content/methods/study-design/#objectives-and-scope"	),
+  c(	"1A",	"1A_3",	"Intended method usage",	"State how often this method/study is intended to be used. For example, is it meant for emergency (ad hoc) analysis or for routine analyses?",	"list create",	"ad hoc analysis; routine analysis",	NA,	TRUE,	"tbd",	"tbd",	"tbd",	"State how often this method/study is intended to be used. For example, is it meant for emergency (ad hoc) analysis or for routine analyses?"	),
+  c(	"1A",	"1A_4",	"Analysis approach",	"State whether the study approach will include non-targeted, suspect screening, and/or targeted analysis.  For more information see: https://nontargetedanalysis.org/reference-content/methods/study-design/#objectives-and-scope (with anchor to NTA/SSA)",	"list create",	"non-targeted analysis; suspect screening analysis; targeted analysis",	NA,	TRUE,	"tbd",	"tbd",	"tbd",	"State whether the study approach will include non-targeted, suspect screening, and/or targeted analysis.  For more information see: https://nontargetedanalysis.org/reference-content/methods/study-design/#objectives-and-scope (with anchor to NTA/SSA)"	),
+  c(	"1A",	"1A_5",	"Chemical space",	"State the intended chemical space for the study. Approaches for evaluating the chemical space of the analytical method and the planned data analysis approaches remain limited.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State the intended chemical space for the study. Approaches for evaluating the chemical space of the analytical method and the planned data analysis approaches remain limited."	),
+  c(	"1A",	"1A_6",	"Target audience",	"State the intended audience of the results of the study. Consider how the audience may need the results to be communicated.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State the intended audience of the results of the study. Consider how the audience may need the results to be communicated."	),
+  c(	"2A",	"2A_1",	"Sample type and quantity",	"Describe the samples to be collected in this study, including the physical state (liquid, gas, solid), types (e.g., soil, sediment, groundwater), and sample quantities (i.e., amount per sample and the total number of samples). NOTE: Consider whether additional quantity of sample will need to be collected for QA/QC samples that are defined in Standards, Calibrants, Replicates, Blanks, and QC Spikes & Samples (Section 3).",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe the samples to be collected in this study, including the physical state (liquid, gas, solid), types (e.g., soil, sediment, groundwater), and sample quantities (i.e., amount per sample and the total number of samples). NOTE: Consider whether additional quantity of sample will need to be collected for QA/QC samples that are defined in Standards, Calibrants, Replicates, Blanks, and QC Spikes & Samples (Section 3)."	),
+  c(	"2A",	"2A_2",	"Sample collection",	"Describe the procedures for collecting the samples described above. Include details such as the use of grab vs. composite samples (or a combination thereof) and the sampling equipment and containers/materials that will be used to collect the samples. ",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe the procedures for collecting the samples described above. Include details such as the use of grab vs. composite samples (or a combination thereof) and the sampling equipment and containers/materials that will be used to collect the samples. "	),
+  c(	"2A",	"2A_3",	"Sample replicates",	"Given your sample type, quantity and collection procedures described above, will replicate samples be taken from the same sample location, time, phenotype, or other variable?",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Given your sample type, quantity and collection procedures described above, will replicate samples be taken from the same sample location, time, phenotype, or other variable?"	),
+  c(	"2A",	"2A_4",	"Overall sampling design",	"Take a step back, and evaluate whether the sampling plan described above will address the intended study objectives.  State any necessary special considerations.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Take a step back, and evaluate whether the sampling plan described above will address the intended study objectives.  State any necessary special considerations."	),
+  c(	"2A",	"2A_5",	"Sampling metadata",	"Describe how you will record, store, and manage information regarding the sample description, collection, handling, and storage. Include any key and/or confounding variables that might impact your study conclusions.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe how you will record, store, and manage information regarding the sample description, collection, handling, and storage. Include any key and/or confounding variables that might impact your study conclusions."	),
+  c(	"2B",	"2B_1",	"Citation for sample preparation method",	"If your sample preparation method is based on a previously reported study or reference method, enter the prior method citation as a URL or DOI.",	"text",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"If your sample preparation method is based on a previously reported study or reference method, enter the prior method citation as a URL or DOI."	),
+  c(	"2B",	"2B_2",	"Sample extraction method",	"If the sample extraction method is novel or is a modified version of the above cited method, describe the sample extraction, enrichment/concentration, filtering, and/or clean-up procedures as a numbered list. This includes all steps between an unmodified sample and producing a final sample extract that is ready for instrumental analysis. Include solvents or other chemicals used for sample extraction.",	"list matrix",	"extraction solvent; sample size; extraction mechanism; clean-up step; filtering step; concentration step!Value",	NA,	TRUE,	"tbd",	"tbd",	"tbd",	"If the sample extraction method is novel or is a modified version of the above cited method, describe the sample extraction, enrichment/concentration, filtering, and/or clean-up procedures as a numbered list. This includes all steps between an unmodified sample and producing a final sample extract that is ready for instrumental analysis. Include solvents or other chemicals used for sample extraction."	),
+  c(	"2B",	"2B_3",	"Sample & sample extract hold time and preservation",	"State the length of time for holding the sample and/or the sample extract, including any preservation protocols or conditions used to ensure sample and extract stability.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State the length of time for holding the sample and/or the sample extract, including any preservation protocols or conditions used to ensure sample and extract stability."	),
+  c(	"2B",	"2B_4",	"Sample preparation method optimization",	"Will any part of the sample preparation protocols need to be optimized? Establish an experimental plan for parameter optimization.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Will any part of the sample preparation protocols need to be optimized? Establish an experimental plan for parameter optimization."	),
+  c(	"2B",	"2B_5",	"Sample extraction method chemical space impact",	"Define how the above-stated sample preparation protocols will limit your chemical space. This can include characteristics such as chemical solubility in the chosen solvent(s), chemical stability, chemical volatility, and the impact of steps such as sample extraction, clean-up, and preservation/storage. NOTE: This is meant to be informative to your understanding of the overall study chemical space.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Define how the above-stated sample preparation protocols will limit your chemical space. This can include characteristics such as chemical solubility in the chosen solvent(s), chemical stability, chemical volatility, and the impact of steps such as sample extraction, clean-up, and preservation/storage. NOTE: This is meant to be informative to your understanding of the overall study chemical space."	),
+  c(	"3A",	"3A_1",	"Table of Analytical Standards",	"Compound Name;Chemical Identifier;Supplier;Stock Solution Name (individual-compound or mixed stock solution);Concentration in Stock Solution [units];Concentration in Sample (if added prior to extraction)[units];Concentration in Final Extract [units]; Paired Isotopically Labeled Standard (if used for quantitation)",	"modal table",	"Compound Name;Chemical Identifier;Supplier;Stock Solution Name (individual-compound or mixed stock solution);Concentration in Stock Solution [units];Concentration in Sample (if added prior to extraction)[units];Concentration in Final Extract [units]; Paired Isotopically Labeled Standard (if used for quantitation)",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Compound Name;Chemical Identifier;Supplier;Stock Solution Name (individual-compound or mixed stock solution);Concentration in Stock Solution [units];Concentration in Sample (if added prior to extraction)[units];Concentration in Final Extract [units]; Paired Isotopically Labeled Standard (if used for quantitation)"	),
+  c(	"3A",	"3A_2",	"Table of Stock Solutions",	"Stock Solution Name;Stock Solution Solvent;Volume of Spike (µL);Spike Timing (e.g., into sample before extraction, into final extract);Samples to which Stock will be added",	"modal table",	"Stock Solution Name;Stock Solution Solvent;Volume of Spike (µL);Spike Timing (e.g., into sample before extraction, into final extract);Samples to which Stock will be added",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Stock Solution Name;Stock Solution Solvent;Volume of Spike (µL);Spike Timing (e.g., into sample before extraction, into final extract);Samples to which Stock will be added"	),
+  c(	"3A",	"3A_3",	"Table  of Standards, Calibrants, Sample Replicates, Blanks, QC Spikes, and QC Samples",	"Name of standard;Intended use: State how each sample/replicate/spike will be used in the study. ;Sample creation method: State how each sample/replicate/spike will be created.; Sample creation and analysis frequency: State how often and how many of each sample type is prepared and analyzed. Note that it may be useful to consider the proportion of the analytical sequence that should include injections/samples relevant to QA/QC (such as blanks, matrix spikes, replicate injections of samples and/or standards, etc.) in determining the sample analysis frequency. ; Performance metric: State the performance metric(s) that will be evaluated for each sample/replicate/spike. ; Performance calculations: State the equation used to calculate each performance metric. ; Performance criteria: State the accepted criteria for each performance metric.",	"modal table",	"Standard, Calibrant, Replicate, Blank, QC Sample or QC Spike Name;Intended Use;Sample Creation Method;Sample Creation and Analysis Frequency;Performance Metric(s);Performance Calculation(s);Performance Criteria",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Name of standard;Intended use: State how each sample/replicate/spike will be used in the study. ;Sample creation method: State how each sample/replicate/spike will be created.; Sample creation and analysis frequency: State how often and how many of each sample type is prepared and analyzed. Note that it may be useful to consider the proportion of the analytical sequence that should include injections/samples relevant to QA/QC (such as blanks, matrix spikes, replicate injections of samples and/or standards, etc.) in determining the sample analysis frequency. ; Performance metric: State the performance metric(s) that will be evaluated for each sample/replicate/spike. ; Performance calculations: State the equation used to calculate each performance metric. ; Performance criteria: State the accepted criteria for each performance metric."	),
+  c(	"4A",	"4A_1",	"Randomization",	"State whether the samples be fully or partially randomly ordered in the analytical sequence. State how will sample randomization be achieved.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State whether the samples be fully or partially randomly ordered in the analytical sequence. State how will sample randomization be achieved."	),
+  c(	"4A",	"4A_2",	"Single vs. Multiple Batch",	"State whether the study samples will be analyzed in a single analytical batch or multiple analytical batches.",	"list",	"single;multiple;unknown",	NA,	FALSE,	"tbd",	"tbd",	"tbd",	"State  whether the study samples will be analyzed in a single analytical batch or multiple analytical batches."	),
+  c(	"4A",	"4A_3",	"Multi-batch comparability and sample overlap",	"If multiple analytical batches are used, state what will be done to enable understanding and determining between-batch effects. Include which QC samples will be analyzed in all analytical batches to support comparisons, and what evaluation approaches will be used to conduct those comparisons. ",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"If multiple analytical batches are used, state what will be done to enable understanding and determining between-batch effects. Include which QC samples will be analyzed in all analytical batches to support comparisons, and what evaluation approaches will be used to conduct those comparisons. "	),
+  c(	"4B",	"4B_1",	"Citation for chromatography method",	"If your chromatography method is based on a previously reported study or reference method, enter the prior method citation as a URL or DOI.",	"text",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"If your chromatography method is based on a previously reported study or reference method, enter the prior method citation as a URL or DOI."	),
+  c(	"4B",	"4B_2",	"Chromatography instrument",	"State the instrument(s) that will be used for chromatography (manufacturer, model). ",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State the instrument(s) that will be used for chromatography (manufacturer, model). "	),
+  c(	"4B",	"4B_3",	"Chromatography parameters",	"If the chromatography method is novel or is a modified version of the above cited method, describe the chromatography parameters as a list. State whether any parameters will be optimized prior to or during the study. For a list of parameters to include, go to Table 2.2 at: https://nontargetedanalysis.org/reference-content/methods/data-acquisition/#chromatography  ",	"list matrix",	"Manufacturer & Model; Column manufacturer;column stationary phase; column length; column inner diameter (ID); column; particle size; column film thickness;Guard column and dimensions; Pore size; 2D Modulator; injector type; autosampler temperature type;Mobile phase;Carrier Gas (type, purity);Column temperature;Isocratic vs. gradient program;Isothermal vs. gradient program;Solvent program;Temperature program;Gas Pressure (w/ flow or pressure control type);Flow rate;Pressure (as diagnostic);pH of eluents and adjustment procedure;Pump type (binary, quaternary);injection size!value",	NA,	TRUE,	"tbd",	"tbd",	"tbd",	"If the chromatography method is novel or is a modified version of the above cited method, describe the chromatography parameters as a list. State whether any parameters will be optimized prior to or during the study. For a list of parameters to include, go to Table 2.2 at: https://nontargetedanalysis.org/reference-content/methods/data-acquisition/#chromatography  "	),
+  c(	"4B",	"4B_4",	"Chromatography chemical space impact",	"Describe how the above-stated chromatography method will impact your chemical space. This can include characteristics such as chemical solubility in the chosen solvent(s), chemical stability, chemical volatility, and chromatographic retention behavior. NOTE: This is meant to inform your understanding of the overall study chemical space.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe how the above-stated chromatography method will impact your chemical space. This can include characteristics such as chemical solubility in the chosen solvent(s), chemical stability, chemical volatility, and chromatographic retention behavior. NOTE: This is meant to inform your understanding of the overall study chemical space."	),
+  c(	"4C",	"4C_1",	"Citation for mass spectrometry method",	"If your mass spectrometry method is based on a previously reported study or reference method, enter the prior method citation as a URL or DOI.",	"text",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"If your mass spectrometry method is based on a previously reported study or reference method, enter the prior method citation as a URL or DOI."	),
+  c(	"4C",	"4C_2",	"Mass spectrometry instrument",	"State the instrument(s) that will be used for mass spectrometry (manufacturer, model). ",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State the instrument(s) that will be used for mass spectrometry (manufacturer, model). "	),
+  c(	"4C",	"4C_3",	"Mass spectrometry parameters",	"If the mass spectrometry method is novel or is a modified version of the above cited method, describe the mass spectrometry parameters as a list. State whether any parameters will be optimized prior to or during the study. Include how the mass spectral data are generated (MS, MS2, AIF, DDA, DIA, SWATH, etc.), because the data type will define what data analyses are possible. For a full list of parameters, go to Table 2.3 at: https://nontargetedanalysis.org/reference-content/methods/data-acquisition/#mass-spec ",	"list matrix",	"Manufacturer & Model; ionization mode; ionization polarity; acquisition type; ion source; scan range; data acquisition/scan rate; resolving power; source temperature; spray voltage; corona current; EI voltage; gas flow; collisional dissociation type; data type (profile or centroid); isolation window; collision energy; fragmentation mode; DDA exclusion time; lens voltages!Value",	NA,	TRUE,	"tbd",	"tbd",	"tbd",	"If the mass spectrometry method is novel or is a modified version of the above cited method, describe the mass spectrometry parameters as a list. State whether any parameters will be optimized prior to or during the study. Include how the mass spectral data are generated (MS, MS2, AIF, DDA, DIA, SWATH, etc.), because the data type will define what data analyses are possible. For a full list of parameters, go to Table 2.3 at: https://nontargetedanalysis.org/reference-content/methods/data-acquisition/#mass-spec "	),
+  c(	"4C",	"4C_4",	"Mass spectrometry chemical space impact",	"Describe how the above-stated mass spectrometry method will limit your chemical space. This can include characteristics such as chemical volatility, chemical ionization potential, and chemical thermal stability. NOTE: This is meant to inform your understanding of the overall study chemical space.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe how the above-stated mass spectrometry method will limit your chemical space. This can include characteristics such as chemical volatility, chemical ionization potential, and chemical thermal stability. NOTE: This is meant to inform your understanding of the overall study chemical space."	),
+  c(	"4C",	"4C_5",	"Mass spectrometer calibration protocol",	"Describe any specific protocols for the calibration of the mass spectrometer m/z accuracy and resolution. State the frequency of instrument calibration and what calibration solution is used (including how it is created, if a non-commercial solution is used).",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe any specific protocols for the calibration of the mass spectrometer m/z accuracy and resolution. State the frequency of instrument calibration and what calibration solution is used (including how it is created, if a non-commercial solution is used)."	),
+  c(	"4C",	"4C_6",	"Mass spectrometer calibration limits",	"State the expected (acceptable) m/z accuracy (in ppm) and resolution of the mass spectrometer.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State the expected (acceptable) m/z accuracy (in ppm) and resolution of the mass spectrometer."	),
+  c(	"4D",	"4D_1",	"Table of System Suitability Protocols and Criteria",	"Name the specific protocol that will be used for system suitability.;State when how frequently the protocol will be performed. For example, at the beginning of each X-hour period, before/after each analytical sequence, etc.; Describe the specific metric that will be measured. ;Enter the equation or describe the calculation algorithm for calculating the metric.;State the acceptable criteria (as a value or an acceptable range) for determining that the instrumental system is suitable for analysis.",	"modal table",	"System Suitability Protocol;System Suitability Evaluation Frequency;System Suitability Metric	;System Suitability Calculation;System Suitability Criteria",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Name the specific protocol that will be used for system suitability.;State when how frequently the protocol will be performed. For example, at the beginning of each X-hour period, before/after each analytical sequence, etc.; Describe the specific metric that will be measured. ;Enter the equation or describe the calculation algorithm for calculating the metric.;State the acceptable criteria (as a value or an acceptable range) for determining that the instrumental system is suitable for analysis."	),
+  c(	"5A",	"5A_1",	"Software and/or code selection",	"State what software and/or code will be used (creator, version) and for which analyses. Define the version(s) used in the study, whether the software is open-source (external or in-house) or proprietary, and if portions of existing software code will be modified for the analyses in this study. ",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State what software and/or code will be used (creator, version) and for which analyses. Define the version(s) used in the study, whether the software is open-source (external or in-house) or proprietary, and if portions of existing software code will be modified for the analyses in this study. "	),
+  c(	"5A",	"5A_2",	"Manual processing or review",	"State whether a user will perform manual processing to reduce, analyze, or review the raw data and/or the outputs from an automated analysis.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State whether a user will perform manual processing to reduce, analyze, or review the raw data and/or the outputs from an automated analysis."	),
+  c(	"5A",	"5A_3",	"New software/code",	"State whether any new software, code, algorithms, packages, or scripts will be developed during this study. If yes, state how will it be developed, version-controlled, and provided for public use.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State whether any new software, code, algorithms, packages, or scripts will be developed during this study. If yes, state how will it be developed, version-controlled, and provided for public use."	),
+  c(	"5B",	"5B_1",	"Define sample groups for data processing",	"State whether and how samples will be grouped for data processing.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State whether and how samples will be grouped for data processing."	),
+  c(	"5B",	"5B_2",	"Data conversion",	"State whether and how the data will be converted to a different format (from the raw data files) for processing/analysis. Define the settings for all parameters for data conversion.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State whether and how the data will be converted to a different format (from the raw data files) for processing/analysis. Define the settings for all parameters for data conversion."	),
+  c(	"5B",	"5B_3",	"Data extraction",	"State the workflow steps that will be used to extract the raw data and produce a list of detected features. Define the settings for all steps. For a representative list of steps, go to Table 3.2 at: https://nontargetedanalysis.org/reference-content/methods/data-processing-and-analysis/#data-processing",	"list matrix",	"centroiding;thresholding;peak width limit; background subtraction!Value",	NA,	TRUE,	"tbd",	"tbd",	"tbd",	"State the workflow steps that will be used to extract the raw data and produce a list of detected features. Define the settings for all steps. For a representative list of steps, go to Table 3.2 at: https://nontargetedanalysis.org/reference-content/methods/data-processing-and-analysis/#data-processing"	),
+  c(	"5B",	"5B_4",	"Data reduction",	"State the workflow steps that will be used to reduce the processed data. State if any steps require comparisons to blanks and/or QC samples, including which blanks/QC samples will be used. Define the settings for all steps. For a representative list of steps, go to Table 3.2 at: https://nontargetedanalysis.org/reference-content/methods/data-processing-and-analysis/#data-processing",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State the workflow steps that will be used to reduce the processed data. State if any steps require comparisons to blanks and/or QC samples, including which blanks/QC samples will be used. Define the settings for all steps. For a representative list of steps, go to Table 3.2 at: https://nontargetedanalysis.org/reference-content/methods/data-processing-and-analysis/#data-processing"	),
+  c(	"5B",	"5B_5",	"Data normalization",	"State the workflow steps that will be used to normalize the reduced data. State if blank and/or QC samples will be used for normalization, including which blanks/QC samples will be used. Define the settings for all steps.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State the workflow steps that will be used to normalize the reduced data. State if blank and/or QC samples will be used for normalization, including which blanks/QC samples will be used. Define the settings for all steps."	),
+  c(	"5B",	"5B_6",	"Data processing chemical space impact",	"Describe how the above-stated data processing methods will impact your chemical space. This can include impacts such as the removal of certain retention time ranges, or the use of minimum peak area thresholds that will eliminate poorly ionized chemicals. NOTE: This is meant to inform your understanding of the overall study chemical space.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe how the above-stated data processing methods will impact your chemical space. This can include impacts such as the removal of certain retention time ranges, or the use of minimum peak area thresholds that will eliminate poorly ionized chemicals. NOTE: This is meant to inform your understanding of the overall study chemical space."	),
+  c(	"5C",	"5C_1",	"Table of Statistical & Chemometric Analyses & Planned Outputs",	"Statistical or Chemometric Analysis Method: Describe the method that will be used, including any relevant citation to published methods;Statistical or Chemometric Analysis Method Goals: State the specific goal of each method. State whether the approaches been validated for the intended use in this study by peer-reviewed literature.;Samples Used & Sample Grouping for Statistical or Chemometric Analysis: State how samples be grouped for statistical/chemometric analyses. Include whether QC samples and/or blanks will be used in the statistical/chemometric approach.;Statistical or Chemometric Analysis Method Assumptions & Thresholds: Define all assumptions and settings/thresholds for the analysis.;Statistical or Chemometric Analysis Equations or Algorithms Used: State the equations or algorithms for the statistical or chemometric analysis, including whether they are publicly available.;Statistical or Chemometric Analysis Output(s): State the planned outputs of the statistical or chemometric analysis, including any visuals or plots.;Statistical or Chemometric Analysis Output Reporting: State how the planned outputs of the statistical or chemometric analysis will be reported.",	"modal table",	"Statistical or Chemometric Analysis Method;Statistical or Chemometric Analysis Method Goals;Samples Used & Sample Grouping for Statistical or Chemometric Analysis;Statistical or Chemometric Analysis Method Assumptions & Thresholds;Statistical or Chemometric Analysis Equations or Algorithms Used;Statistical or Chemometric Analysis Output(s);Statistical or Chemometric Analysis Output Reporting",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Statistical or Chemometric Analysis Method: Describe the method that will be used, including any relevant citation to published methods;Statistical or Chemometric Analysis Method Goals: State the specific goal of each method. State whether the approaches been validated for the intended use in this study by peer-reviewed literature.;Samples Used & Sample Grouping for Statistical or Chemometric Analysis: State how samples be grouped for statistical/chemometric analyses. Include whether QC samples and/or blanks will be used in the statistical/chemometric approach.;Statistical or Chemometric Analysis Method Assumptions & Thresholds: Define all assumptions and settings/thresholds for the analysis.;Statistical or Chemometric Analysis Equations or Algorithms Used: State the equations or algorithms for the statistical or chemometric analysis, including whether they are publicly available.;Statistical or Chemometric Analysis Output(s): State the planned outputs of the statistical or chemometric analysis, including any visuals or plots.;Statistical or Chemometric Analysis Output Reporting: State how the planned outputs of the statistical or chemometric analysis will be reported."	),
+  c(	"5C",	"5C_2",	"Statistical and chemometric analysis space impact",	"Describe how the selected statistical and chemometric analyses will impact your chemical space. This can include impacts such as XXX…  NOTE: This is meant to inform your understanding of the overall study chemical space.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe how the selected statistical and chemometric analyses will impact your chemical space. This can include impacts such as XXX…  NOTE: This is meant to inform your understanding of the overall study chemical space."	),
+  c(	"5D",	"5D_1",	"Annotation / identification workflow",	"Describe the general workflow for chemicals to be annotated or identified in the samples. Include any parameters or thresholds that must be used for this workflow.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe the general workflow for chemicals to be annotated or identified in the samples. Include any parameters or thresholds that must be used for this workflow."	),
+  c(	"5D",	"5D_2",	"Library/database for annotation / identification",	"State whether a mass spectral library or database will be used to annotate or identify chemicals in your samples. If yes, describe the library or database. Include the type of data (e.g., chemical formulas, MS2 spectra, etc.), the source of the data (and its public availability), how the data was collected/curated, and the quality of the data.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State whether a mass spectral library or database will be used to annotate or identify chemicals in your samples. If yes, describe the library or database. Include the type of data (e.g., chemical formulas, MS2 spectra, etc.), the source of the data (and its public availability), how the data was collected/curated, and the quality of the data."	),
+  c(	"5D",	"5D_3",	"Annotation / identification confidence",	"Describe the schema for categorizing or communicating the confidence of annotation or identification of chemicals in the sample. State any thresholds for acceptable annotation/identification, and state how evidence of annotations/identifications will be communicated. If using a previously stated confidence schema (e.g., the Schymanski scale), just enter the citation as a URL or DOI. If a previously stated scale will be used, include any modifications for your study. ",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe the schema for categorizing or communicating the confidence of annotation or identification of chemicals in the sample. State any thresholds for acceptable annotation/identification, and state how evidence of annotations/identifications will be communicated. If using a previously stated confidence schema (e.g., the Schymanski scale), just enter the citation as a URL or DOI. If a previously stated scale will be used, include any modifications for your study. "	),
+  c(	"5D",	"5D_4",	"Annotation / identification chemical space impact",	"Describe how the above-stated annotation/identification workflow will limit your chemical space. This can include the chemical characteristics of the library/database, the size of the library/database, or the source of the data for the library/database. NOTE: This is meant to inform your understanding of the overall study chemical space.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe how the above-stated annotation/identification workflow will limit your chemical space. This can include the chemical characteristics of the library/database, the size of the library/database, or the source of the data for the library/database. NOTE: This is meant to inform your understanding of the overall study chemical space."	),
+  c(	"5E",	"5E_1",	"qNTA workflow",	"Describe the general workflow for quantitative NTA. State any parameters or thresholds and their values. Ensure that any methods for peak area normalization or other data treatment prior to quantitation are stated in Data Processing Workflow (Section 5B).",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe the general workflow for quantitative NTA. State any parameters or thresholds and their values. Ensure that any methods for peak area normalization or other data treatment prior to quantitation are stated in Data Processing Workflow (Section 5B)."	),
+  c(	"5E",	"5E_2",	"Uncertainty analysis",	"State how uncertainty of the qNTA approach will be determined, and the expected bounds of the results.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State how uncertainty of the qNTA approach will be determined, and the expected bounds of the results."	),
+  c(	"5E",	"5E_3",	"Concurrent vs. retrospective analysis",	"State if qNTA will be performed concurrently with the NTA workflow or if quantitation will occur retrospectively (or both)? If retrospective quantitation will occur, state methods used to ensure the data is usable for quantitation.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State if qNTA will be performed concurrently with the NTA workflow or if quantitation will occur retrospectively (or both)? If retrospective quantitation will occur, state methods used to ensure the data is usable for quantitation."	),
+  c(	"5E",	"5E_4",	"qNTA chemical space impact",	"Describe how the above-stated qNTA workflow will limit your quantitative chemical space. This can include…XXX NOTE: This is meant to inform your understanding of the overall study chemical space.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe how the above-stated qNTA workflow will limit your quantitative chemical space. This can include…XXX NOTE: This is meant to inform your understanding of the overall study chemical space."	),
+  c(	"5F",	"5F_1",	"Data types",	"State the types of data that will be produced during this study.",	"list create",	"raw data; processed data; derived data; results files; publication supporting information",	NA,	TRUE,	"tbd",	"tbd",	"tbd",	"State the types of data that will be produced during this study."	),
+  c(	"5F",	"5F_2",	"Data chain of custody",	"State the protocols for the control and maintenance of the data. Include specific processes, such as manual record-keeping or use of an automated tracking system (such as LIMS) to track changes to the data itself.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State the protocols for the control and maintenance of the data. Include specific processes, such as manual record-keeping or use of an automated tracking system (such as LIMS) to track changes to the data itself."	),
+  c(	"5F",	"5F_3",	"Data storage",	"State how the data will be stored.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State how the data will be stored."	),
+  c(	"5F",	"5F_4",	"Data backup",	"State how the data will be protected and backed up. Include specific protocols, such as back-up frequency and type.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State how the data will be protected and backed up. Include specific protocols, such as back-up frequency and type."	),
+  c(	"5F",	"5F_5",	"Data sharing",	"Describe the how the data will be shared and version-controlled. Include the types of data that will be shareable, any restrictions on who can access the data, and how other researchers can request access to the data.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe the how the data will be shared and version-controlled. Include the types of data that will be shareable, any restrictions on who can access the data, and how other researchers can request access to the data."	),
+  c(	"6A",	"6A_1",	"Table of QA/QC procedures",	"Sub-Category: State the component of the study for which performance will be evaluated, such as sample preparation, data acquisition, data processing, annotation & identification, statistical & chemometric analysis, or qNTA.;Aspect: State the QA/QC aspect that will be evaluated (e.g., accuracy, precision, limit of detection, quantitation, or identification (LOD/LOQ/LOI)).;Performance Metric: State the performance metric(s) that will be used to evaluate the chosen QA/QC aspect.;Performance Calculation: State the calculation(s) used to for each selected metric.;Performance Criteria: State the accepted criteria for each performance metric",	"modal table",	"Sub-Category;QA/QC Aspect;Performance Metric;Performance Calculation;Performance Criteria",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Sub-Category: State the component of the study for which performance will be evaluated, such as sample preparation, data acquisition, data processing, annotation & identification, statistical & chemometric analysis, or qNTA.;Aspect: State the QA/QC aspect that will be evaluated (e.g., accuracy, precision, limit of detection, quantitation, or identification (LOD/LOQ/LOI)).;Performance Metric: State the performance metric(s) that will be used to evaluate the chosen QA/QC aspect.;Performance Calculation: State the calculation(s) used to for each selected metric.;Performance Criteria: State the accepted criteria for each performance metric"	),
+  c(	"6B",	"6B_1",	"QA/QC Deviations - Data Inclusion",	"State how data will be reported if QA/QC metrics did not meet the established criteria. This can include whether samples will be excluded from analyses and/or reporting.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"State how data will be reported if QA/QC metrics did not meet the established criteria. This can include whether samples will be excluded from analyses and/or reporting."	),
+  c(	"6B",	"6B_2",	"QA/QC Deviations - Data Flagging",	"Describe the procedures for identifying or flagging specific results and/or samples for which QA/QC metrics did not meet the established criteria.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe the procedures for identifying or flagging specific results and/or samples for which QA/QC metrics did not meet the established criteria."	),
+  c(	"6B",	"6B_3",	"QA/QC Deviations - Corrective Action",	"Describe any corrective actions that will be performed if QA/QC metrics do not meet established criteria.",	"textarea",	"enter text",	NA,	NA,	"tbd",	"tbd",	"tbd",	"Describe any corrective actions that will be performed if QA/QC metrics do not meet established criteria."	)
+)
+)
+colnames(input_values) <- c("element", "name",	"desc",	"tooltip",	"type",	"value",	"restrict",	"multiple",	"example1",	"example2",	"example3",	"example4")
+
+element_values <- data.frame(rbind(
+  c(	"1A",	"Study Objective and Scope",	"Prior to the designing other aspects of an NTA study, it is important for non-targeted analysis researchers to first examine their study’s objectives and scope. Specific decisions regarding the study objectives and scope will impact sampling design, controls, and performance metrics (among other aspects). For more information regarding this section, go to: https://nontargetedanalysis.org/reference-content/methods/study-design/#objectives-and-scope"	),
+  c(	"2A",	"Sample Information",	"Describe the samples and sampling design, including the use of replicates, availability of blanks and QC samples, and a plan for storing sampling metadata. For more general information, go to: https://nontargetedanalysis.org/reference-content/methods/study-design/#sample-info-and-prep "	),
+  c(	"2B",	"Sample Preparation",	"Define all sample preparation method parameters for the study. Describe any need for parameter optimization and whether the selected method is appropriate for the chemicals of interest in the study. For more information, go to: https://nontargetedanalysis.org/reference-content/methods/study-design/#sample-info-and-prep "	),
+  c(	"3A",	"Standards, Calibrants, Replicates, Blanks, QC Spikes, & QC Samples",	"Detail all analytical standards, calibrants, replication, blanks, QC spikes, and QC samples that will be used in the study. The tables below are intended to walk stepwise through the relevant information. For more information, go to: https://nontargetedanalysis.org/reference-content/methods/study-design/#sample-info-and-prep and https://nontargetedanalysis.org/reference-content/methods/study-design/#qc-spikes-and-samples."	),
+  c(	"4A",	"Analytical Sequence and Batches",	"Determine the structure of the analytical sequence including randomization, quality control frequency, and sample replication. Identify if the study will use a single analytical batch or multiple batches, and how data from multiple batches will be combined. For more information, go to: https://nontargetedanalysis.org/reference-content/methods/data-acquisition/#analytical-sequence "	),
+  c(	"4B",	"Chromatography",	"During study design, it is important to define all chromatography method parameters for the study and identify any parameters that may need to be adjusted prior to the study. For more information, go to: https://nontargetedanalysis.org/reference-content/methods/data-acquisition/#chromatography  "	),
+  c(	"4C",	"Mass Spectrometry",	"During study design, it is important to define all mass spectrometry method parameters for the study and identify any parameters that may need to be adjusted prior to the study. For more information, go to: https://nontargetedanalysis.org/reference-content/methods/data-acquisition/#mass-spec"	),
+  c(	"4D",	"System Suitability",	"System suitability covers a set of materials and procedures intended to verify the performance of an instrumental method . In laymen’s terms, system suitability is a check to see if the system is working. It is important to include system suitability checks prior to, and potentially during and after, an analytical sequence to verify that the instrument will produce high quality data."	),
+  c(	"5A",	"Software",	"For most non-targeted analysis workflows, one or more software or code-based tools are used to perform processing, statistical/chemometric analyses, annotation/identification of chemicals, and quantitative NTA. For more information, go to: https://nontargetedanalysis.org/reference-content/methods/data-processing-and-analysis/#data-processing "	),
+  c(	"5B",	"Data Processing Workflow",	"Describe the data conversion, extraction, reduction, and normalization steps used to isolate features of interest prior to further data analysis. For more information, go to: https://nontargetedanalysis.org/reference-content/methods/data-processing-and-analysis/#data-processing."	),
+  c(	"5C",	"Statistical & Chemometric Analysis Workflow",	"Determine the statistical or chemometric analyses and associated parameters. For more information, go to: https://nontargetedanalysis.org/reference-content/methods/data-processing-and-analysis/#statistical-analysis "	),
+  c(	"5D",	"Annotation & Identification Workflow",	"Annotation and identification workflows are essential to translating analytical data into meaningful elemental formulas, chemical classes, and/or chemical structures and identifications. Describe the protocols by which features are annotated or identified after data processing. For more information, go to: https://nontargetedanalysis.org/reference-content/methods/data-processing-and-analysis/#annotation-and-id "	),
+  c(	"5E",	"qNTA  Workflow",	"Quantitative non-targeted analysis (qNTA) is an emerging area of NTA studies for which unknown chemicals are not only identified, but estimates for quantity (i.e., concentration) in the sample are provided. This can be done concurrent with the study or in the future (retrospectively). In order to produce data that can be analyzed quantitatively, there are specific considerations that should be made beforehand."	),
+  c(	"5F",	"Data Management Plan",	"Proper management of the raw, processed, and analyzed data for this study will enable researchers to adequately use and share the data, as well as enable the use of the data in future (retrospective) analyses. It is important to define types of data that will be generated and how data will be collected, stored, and shared."	),
+  c(	"6A",	"QA/QC  ",	"Quality assurance and quality control is essential to evaluate the method performance and to ensure study results data are trustworthy and appropriate for use in decision-making. For more information, go to: https://nontargetedanalysis.org/reference-content/results/qa-qc-metrics/. "),
+  c("6B", "QA/QC Deviations", "Placeholder for QA/QC Deviations management")
+))
+
+colnames(element_values) <- c("element", "name", "desc")
+
+reacts <- reactiveValues(examplechoice = 1, score = 0, input_scores = data.frame(inputs = input_values$name, values = rep(0, nrow(input_values))))
+#because this needs to be reactive and manually made right now
+output_tables <- reactiveValues()
+
+
+#In-App Specific Functions
+dynamic_input_fn <- function(name, desc, type, value, restrict = NULL, width = "100%", multiple = FALSE) {
+  returnfn <- NULL
+  if (type == "text") {
+    returnfn <- textInput(inputId = name, label = desc, value = value, width = width)
+  }
+  if (type == "textarea") {
+    returnfn <- textAreaInput(inputId = name, label = desc, value = value, width = width)
+  }
+  if (type == "numeric") {
+    if (!is.na(restrict)) {
+      restricts <- as.numeric(unlist(strsplit(restrict, split = ":")))
+      returnfn <- numericInput(inputId = name, label = desc, value = value, min = restricts[1], max = restricts[2], step = restricts[3], width = width)
+    }
+    if (is.na(restrict)) {
+      returnfn <- numericInput(inputId = name, label = desc, value = value, width = width)
+    }
+  }
+  if (type == "list") {
+    returnfn <- selectizeInput(inputId = name, label = desc, choices = unlist(strsplit(value, split = ";")), width = width, multiple = as.logical(multiple))
+  }
+  if (type == "list create") {
+    returnfn <- selectizeInput(inputId = name, 
+                               label = desc, 
+                               choices = unlist(strsplit(value, split = ";")), 
+                               width = width, 
+                               multiple = as.logical(multiple),
+                               options = list(create = TRUE))
+  }
+  if (type == "list matrix") {
+    val <- unlist(strsplit(value, split = "!"))
+    val <- val[1]
+    returnfn <- list(
+      selectizeInput(inputId = name,
+                     label = desc,
+                     choices = unlist(strsplit(val, split = ";")), 
+                     width = width, 
+                     multiple = as.logical(multiple),
+                     options = list(create = TRUE)),
+      DT::DTOutput(outputId = paste0("table_",name))
+    )
+  }
+  if (type == "modal table") {
+    returnfn <- list(
+      p(desc),
+      actionButton(paste0("add_", name), "Add Value"),
+      actionButton(paste0("remove_", name), "Remove Value"),
+      DT::DTOutput(outputId = paste0("table_", name)),
+      br()
+    )
+  }
+  returnfn
+}
+
+dynamic_modal <- function(title, name, inputs, helps, ok = "Add value", size = "xl") {
+  inputs <- unlist(strsplit(inputs, split = ";"))
+  helps <- unlist(strsplit(helps, split = ";"))
+  modalDialog(
+    title = title,
+    size = size,
+    easyClose = TRUE,
+    lapply(1:length(inputs), function(x)
+      fluidRow(
+        textInput(inputId = paste0("modal_", name, inputs[x]), inputs[x]), p(helps[x])
+      )),
+    footer = tagList(actionButton(paste0("modal_ok_", name), ok), modalButton("Cancel"))
+  )
+}
+
+# Define header
+header <- dashboardHeader(title = "NTA-SPT")
+
+# Define sidebar
+sidebar <- dashboardSidebar(
+  sidebarMenu(id = "tabs",
+              menuItem("About", tabName = "about", selected = TRUE, icon = icon("question", lib = "font-awesome")),
+              menuItem("Examples", tabName = "examples", icon = icon("id-card", lib = "font-awesome")),
+              menuItem("Background and Objectives", tabName = "background", icon = icon("scroll", lib = "font-awesome")),
+              menuItem("Sample Information", tabName = "samples", icon = icon("glass-water", lib = "font-awesome")),
+              menuItem("Standards and Controls", tabName = "standards",icon = icon("flask", lib = "font-awesome")),
+              menuItem("Data Acquisition", tabName = "method", icon = icon("microscope", lib = "font-awesome")),
+              menuItem("Data Processing", tabName = "dataproc", icon = icon("computer", lib = "font-awesome")),
+              menuItem("QA/QC", tabName = "qaqc", icon = icon("list-check", lib = "font-awesome")),
+              menuItem("Export SMRT", tabName = "export", icon = icon("download", lib = "font-awesome")),
+              selectInput("examples",label = "Load", choices = c("Additional Information", "1) Contaminated food", "2) Polluted river", "3) Human exposure"), selected = NULL),
+              actionButton("user_guide", label = "Launch User Guide"),
+              actionButton("browser", label = "Browser"),
+              htmlOutput("progress")
+  )
+)
+
+# Define body
+
+body <- dashboardBody(
+  tabItems(
+    tabItem(tabName = "about",
+            p("This is where about information will go")
+    ),
+    tabItem(tabName = "export",
+            #fluidRow(downloadButton(outputId = "sop_export", label = "Download data in a SOP format", icon = icon("file-download", verify_fa = FALSE))),
+            #fluidRow(downloadButton(outputId = "plan_export", label = "Download data in a Study Plan format", icon = icon("file-download", verify_fa = FALSE))),
+            fluidRow(downloadButton(outputId = "raw_export", label = "Download raw data as a JSON", icon = icon("file-download", verify_fa = FALSE)))
+    ),
+    tabItem(tabName = "examples",
+            h2("Example Study Designs"),
+            h4("We have provided 3 different examples for studies and provided details in each section about that study. You can populate the examples by selecting the drop-down menu on the left."),
+            fluidRow(box(title = "Example 1 - Contaminated food",
+                         p("You are a scientist at a state regulatory lab (environmental/public health) that has experience in measuring contaminants in food and agricultural products via non-targeted analysis. You need to design a generalizable study to be ready for the following example: The local police department has a case of a single person getting sick from eating at a local farm-to-table restaurant, the only difference between the victim's meal and others was that they ate mashed potatoes with their meal. To discern the possibility that the mashed potatoes were the culprit, the police officers bring 10 g of sample in a sealed plastic bag to you to test for any possible chemical contaminants.")
+            )), 
+            fluidRow(box(title = "Example 2 - Polluted water",
+                         p("Evaluate potential contamination from a chemical manufacturing facility located on a river")
+            )), 
+            fluidRow(box(title = "Example 3 - Human exposure",
+                         p("A epidemiologist wants to conduct an exploratory analysis that helps identify unsuspected chemical exposures in a population with a particular disease.")
+            ))
+    ),
+    tabItem(tabName = "background",
+            fluidRow(
+              #element info
+              {
+                  j <- 1 #set this manually
+                  el_num <- element_values$element[j]
+                  el_name <- element_values$name[j]
+                  el_desc <- element_values$desc[j]
+                  inputs <- input_values[which(input_values$element == el_num),]
+                  fns <- list()
+                  tt <- list()
+                  for (i in 1:nrow(inputs)) {
+                    fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                    fns <- list(fns, fn)
+                    # if (!is.na(inputs$tooltip[i])) {
+                    #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                    #   fns <- list(fns, tt)
+                    # }
+                  }
+                  do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+                },
+              #exampleinfo
+              {
+                j <- 1 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+              )
+    ),
+    tabItem(tabName = "samples",
+            fluidRow(
+              #element info
+              {
+                j <- 2 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 2 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            ),
+            fluidRow(
+              #element info
+              {
+                j <- 3 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 3 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            )
+    ),
+    tabItem(tabName = "standards",
+            fluidRow(
+              #element info
+              {
+                j <- 4 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 4 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            )
+    ),
+    tabItem(tabName = "method",
+            fluidRow(
+              #element info
+              {
+                j <- 5 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 5 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            ),
+            fluidRow(
+              #element info
+              {
+                j <- 6 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 6 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            ),
+            fluidRow(
+              #element info
+              {
+                j <- 7 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 7 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            )
+    ),
+    tabItem(tabName = "dataproc",
+            fluidRow(
+              #element info
+              {
+                j <- 9 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 9 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            ),
+            fluidRow(
+              #element info
+              {
+                j <- 10 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 10 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            ),
+            fluidRow(
+              #element info
+              {
+                j <- 11 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 11 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            ),
+            fluidRow(
+              #element info
+              {
+                j <- 12 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 12 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            ),
+            fluidRow(
+              #element info
+              {
+                j <- 13 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 13 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            ),
+            fluidRow(
+              #element info
+              {
+                j <- 14 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 14 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            )
+    ),
+    tabItem(tabName = "qaqc",
+            fluidRow(
+              #element info
+              {
+                j <- 15 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 15 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            ),
+            fluidRow(
+              #element info
+              {
+                j <- 16 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                tt <- list()
+                for (i in 1:nrow(inputs)) {
+                  fn <- dynamic_input_fn(name = inputs$name[i], desc = inputs$desc[i], type = inputs$type[i], value = inputs$value[i], restrict = inputs$restrict[i], multiple = inputs$multiple[i])
+                  fns <- list(fns, fn)
+                  # if (!is.na(inputs$tooltip[i])) {
+                  #   tt <- bsTooltip(inputs$name[i], title = inputs$tooltip[i], placement = "top")
+                  #   fns <- list(fns, tt)
+                  # }
+                }
+                do.call(box, list(title = el_name, p(el_desc), fns, collapsible = TRUE, collapsed = FALSE, width = 8))
+              },
+              #exampleinfo
+              {
+                j <- 16 #set this manually
+                el_num <- element_values$element[j]
+                el_name <- element_values$name[j]
+                el_desc <- element_values$desc[j]
+                inputs <- input_values[which(input_values$element == el_num),]
+                fns <- list()
+                fns <- lapply(1:nrow(inputs), function(i) {
+                  p(HTML(paste0(tags$strong(inputs$desc[i]), ": ", inputs[["example4"]][i])))
+                })
+                do.call(box, list(title = paste0("Examples"), fns, collapsible = TRUE, collapsed = FALSE, width = 4))
+              }
+            )
+    )
+  )
+)
+
+# create UI
+
+
+ui <- dashboardPage( header, sidebar, body, skin = "blue")
+
+# Define server logic required to draw a histogram
+server <- shinyServer(function(input, output, session) {
+  #Warning message
+  shinyalert("Welcome!", "This is currently in development and should not be used for any reason other than that.", type = "info")
+  
+  
+  observeEvent(input$examples, {
+    reacts$examplechoice <- switch(input$examples,
+                                   "1) Contaminated food" = 1, "2) Polluted river" = 2, "3) Human exposure" = 3, "Additional Information" = 4
+    )
+  })
+  
+  # output$sop_export <- downloadHandler(
+  #   filename = function() {
+  #     paste0("SPT_SOPFormat_", Sys.Date(), ".docx")
+  #   },
+  #   content = function(file) {
+  #     input_table <- input_values[,c("element", "name", "desc")]
+  #     element_names <- sapply(1:nrow(input_table), function(x) element_values$name[which(element_values$element == input_table$element[x])])
+  #     input_data <- sapply(input_table$name, function(y) paste(input[[y]], collapse = ", "))
+  #     dat <- data.frame(element = input_table$element, element_name = element_names, id = input_table$name, description = input_table$desc, input = input_data)
+  #     rownames(dat) <- dat$id
+  #     outputfile <- rmarkdown::render('template/sop_template.Rmd', 
+  #                                     output_file = "test_output.docx", 
+  #                                     params = list(dat = dat))
+  #     file.copy(outputfile, file)
+  #   }
+  # )
+  
+  # output$plan_export <- downloadHandler(
+  #   filename = function() {
+  #     paste0("SPT_PlanFormat_", Sys.Date(), ".csv")
+  #   },
+  #   content = function(file) {
+  #     input_table <- input_values[,c("element", "name", "desc")]
+  #     element_names <- sapply(1:nrow(input_table), function(x) element_values$name[which(element_values$element == input_table$element[x])])
+  #     input_data <- sapply(input_table$name, function(y) input[[y]])
+  #     output_table <- cbind(element = input_table$element, element_name = element_names, id = input_table$name, description = input_table$desc, input = input_data)
+  #     write.csv(output_table, file, row.names = FALSE)
+  #   }
+  # )
+  
+  output$raw_export <- downloadHandler(
+    filename = function() {
+      paste0("SPTrawdata_", Sys.Date(), ".JSON")
+    },
+    content = function(file) {
+      export_dat <- sapply(names(input)[grep("^[[:digit:]]+[[:alpha:]]_", names(input))], function(x) input[[x]])
+      output_dat <- jsonlite::toJSON(export_dat)
+      write(output_dat, file)
+    }
+  )
+  
+  observeEvent(input$browser, {browser()})
+  
+  ## List Matrix tables
+  
+  #2B_2
+  output$table_2B_2 <- renderDT({
+    parameters <- input[["2B_2"]]
+    if (!is.null(parameters)) {
+      val <- input_values$value[which(input_values$name == "2B_2")]
+      val <- unlist(strsplit(val, "!"))
+      inputs <- unlist(strsplit(val[2], ";"))
+      output_tables$table_2B_2 <- data.frame(matrix("", nrow = length(parameters), ncol = length(inputs), dimnames = list(parameters, inputs)))
+      output_tables$table_2B_2
+    }
+  }, editable = TRUE, options = list(dom = 't', ordering = FALSE, paging = FALSE))
+  
+  observeEvent(input$table_2B_2_cell_edit, {
+    row  <- input$table1_cell_edit$row
+    clmn <- input$table1_cell_edit$col
+    output_tables$table_2B_2[row, clmn] <- input$table1_cell_edit$value
+  })
+  
+  #4B_3
+  output$table_4B_3 <- renderDT({
+    parameters <- input[["4B_3"]]
+    if (!is.null(parameters)) {
+      val <- input_values$value[which(input_values$name == "4B_3")]
+      val <- unlist(strsplit(val, "!"))
+      inputs <- unlist(strsplit(val[2], ";"))
+      output_tables$table_4B_3 <- data.frame(matrix("", nrow = length(parameters), ncol = length(inputs), dimnames = list(parameters, inputs)))
+      output_tables$table_4B_3
+    }
+  }, editable = TRUE, options = list(dom = 't', ordering = FALSE, paging = FALSE))
+  
+  observeEvent(input$table_4B_3_cell_edit, {
+    row  <- input$table1_cell_edit$row
+    clmn <- input$table1_cell_edit$col
+    output_tables$table_4B_3[row, clmn] <- input$table1_cell_edit$value
+  })
+  
+  #4C_3
+  output$table_4C_3 <- renderDT({
+    parameters <- input[["4C_3"]]
+    if (!is.null(parameters)) {
+      val <- input_values$value[which(input_values$name == "4C_3")]
+      val <- unlist(strsplit(val, "!"))
+      inputs <- unlist(strsplit(val[2], ";"))
+      output_tables$table_4C_3 <- data.frame(matrix("", nrow = length(parameters), ncol = length(inputs), dimnames = list(parameters, inputs)))
+      output_tables$table_4C_3
+    }
+  }, editable = TRUE, options = list(dom = 't', ordering = FALSE, paging = FALSE))
+  
+  observeEvent(input$table_4C_3_cell_edit, {
+    row  <- input$table1_cell_edit$row
+    clmn <- input$table1_cell_edit$col
+    output_tables$table_4C_3[row, clmn] <- input$table1_cell_edit$value
+  })
+  
+  #5B_3
+  output$table_5B_3 <- renderDT({
+    parameters <- input[["5B_3"]]
+    if (!is.null(parameters)) {
+      val <- input_values$value[which(input_values$name == "5B_3")]
+      val <- unlist(strsplit(val, "!"))
+      inputs <- unlist(strsplit(val[2], ";"))
+      output_tables$table_5B_3 <- data.frame(matrix("", nrow = length(parameters), ncol = length(inputs), dimnames = list(parameters, inputs)))
+      output_tables$table_5B_3
+    }
+  }, editable = TRUE, options = list(dom = 't', ordering = FALSE, paging = FALSE))
+  
+  observeEvent(input$table_5B_3_cell_edit, {
+    row  <- input$table1_cell_edit$row
+    clmn <- input$table1_cell_edit$col
+    output_tables$table_5B_3[row, clmn] <- input$table1_cell_edit$value
+  })
+  
+  
+  ## MODAL START - must be manually modified in this file
+  #3A_1 -- modal start
+  
+  observeEvent(input$add_3A_1, {
+    showModal(
+      dynamic_modal(
+        title = input_values$desc[which(input_values$name == "3A_1")],
+        name = "3A_1",
+        inputs = input_values$value[which(input_values$name == "3A_1")],
+        helps = input_values$tooltip[which(input_values$name == "3A_1")],
+        ok = "Add Value",
+        size = "xl"
+      )
+    )
+  })
+  
+  observeEvent(input$modal_ok_3A_1, {
+    get_input_inds <- names(input)[grep("modal_3A_1", names(input))]
+    output_tables$table_3A_1 <- rbind(output_tables$table_3A_1, sapply(get_input_inds, function(x) input[[x]]))
+    colnames(output_tables$table_3A_1) <- unlist(strsplit(input_values$value[which(input_values$name == "3A_1")], split = ";"))
+    output$table_3A_1 <- DT::renderDT(output_tables$table_3A_1, 
+                                      selection = 'single', 
+                                      options = list(paging = FALSE, dom = 't', ordering = FALSE), width = '50%')
+    removeModal()
+  })
+  
+  observeEvent(input$remove_3A_1, {
+    if (nrow(output_tables$table_3A_1) == 1) {
+      output_tables$table_3A_1 <- data.frame()
+    }
+    if (nrow(output_tables$table_3A_1) > 1) {
+      output_tables$table_3A_1 <- output_tables$table_3A_1[-input$table_3A_1_rows_selected,,drop = FALSE]
+    }
+  })
+  
+  #3A_1 -- modal end
+  
+  #3A_2 -- modal start
+  
+  observeEvent(input$add_3A_2, {
+    showModal(
+      dynamic_modal(
+        title = input_values$desc[which(input_values$name == "3A_2")],
+        name = "3A_2",
+        inputs = input_values$value[which(input_values$name == "3A_2")],
+        helps = input_values$tooltip[which(input_values$name == "3A_2")],
+        ok = "Add Value",
+        size = "xl"
+      )
+    )
+  })
+  
+  observeEvent(input$modal_ok_3A_2, {
+    get_input_inds <- names(input)[grep("modal_3A_2", names(input))]
+    output_tables$table_3A_2 <- rbind(output_tables$table_3A_2, sapply(get_input_inds, function(x) input[[x]]))
+    colnames(output_tables$table_3A_2) <- unlist(strsplit(input_values$value[which(input_values$name == "3A_2")], split = ";"))
+    output$table_3A_2 <- DT::renderDT(output_tables$table_3A_2, 
+                                      selection = 'single', 
+                                      options = list(paging = FALSE, dom = 't', ordering = FALSE), width = '50%')
+    removeModal()
+  })
+  
+  observeEvent(input$remove_3A_2, {
+    if (nrow(output_tables$table_3A_2) == 1) {
+      output_tables$table_3A_2 <- data.frame()
+    }
+    if (nrow(output_tables$table_3A_2) > 1) {
+      output_tables$table_3A_2 <- output_tables$table_3A_2[-input$table_3A_2_rows_selected,,drop = FALSE]
+    }
+  })
+  
+  #3A_2 -- modal end
+  
+  #3A_3 -- modal start
+  
+  observeEvent(input$add_3A_3, {
+    showModal(
+      dynamic_modal(
+        title = input_values$desc[which(input_values$name == "3A_3")],
+        name = "3A_3",
+        inputs = input_values$value[which(input_values$name == "3A_3")],
+        helps = input_values$tooltip[which(input_values$name == "3A_3")],
+        ok = "Add Value",
+        size = "xl"
+      )
+    )
+  })
+  
+  observeEvent(input$modal_ok_3A_3, {
+    get_input_inds <- names(input)[grep("modal_3A_3", names(input))]
+    output_tables$table_3A_3 <- rbind(output_tables$table_3A_3, sapply(get_input_inds, function(x) input[[x]]))
+    colnames(output_tables$table_3A_3) <- unlist(strsplit(input_values$value[which(input_values$name == "3A_3")], split = ";"))
+    output$table_3A_3 <- DT::renderDT(output_tables$table_3A_3, 
+                                      selection = 'single', 
+                                      options = list(paging = FALSE, dom = 't', ordering = FALSE), width = '50%')
+    removeModal()
+  })
+  
+  observeEvent(input$remove_3A_3, {
+    if (nrow(output_tables$table_3A_3) == 1) {
+      output_tables$table_3A_3 <- data.frame()
+    }
+    if (nrow(output_tables$table_3A_3) > 1) {
+      output_tables$table_3A_3 <- output_tables$table_3A_3[-input$table_3A_3_rows_selected,,drop = FALSE]
+    }
+  })
+  
+  #3A_3 -- modal end
+  
+  #4D_1 -- modal start
+  
+  observeEvent(input$add_4D_1, {
+    showModal(
+      dynamic_modal(
+        title = input_values$desc[which(input_values$name == "4D_1")],
+        name = "4D_1",
+        inputs = input_values$value[which(input_values$name == "4D_1")],
+        helps = input_values$tooltip[which(input_values$name == "4D_1")],
+        ok = "Add Value",
+        size = "xl"
+      )
+    )
+  })
+  
+  observeEvent(input$modal_ok_4D_1, {
+    get_input_inds <- names(input)[grep("modal_4D_1", names(input))]
+    output_tables$table_4D_1 <- rbind(output_tables$table_4D_1, sapply(get_input_inds, function(x) input[[x]]))
+    colnames(output_tables$table_4D_1) <- unlist(strsplit(input_values$value[which(input_values$name == "4D_1")], split = ";"))
+    output$table_4D_1 <- DT::renderDT(output_tables$table_4D_1, 
+                                      selection = 'single', 
+                                      options = list(paging = FALSE, dom = 't', ordering = FALSE), width = '50%')
+    removeModal()
+  })
+  
+  observeEvent(input$remove_4D_1, {
+    if (nrow(output_tables$table_4D_1) == 1) {
+      output_tables$table_4D_1 <- data.frame()
+    }
+    if (nrow(output_tables$table_4D_1) > 1) {
+      output_tables$table_4D_1 <- output_tables$table_4D_1[-input$table_4D_1_rows_selected,,drop = FALSE]
+    }
+  })
+  
+  #4D_1 -- modal end
+  
+  #5C_1 -- modal start
+  
+  observeEvent(input$add_5C_1, {
+    showModal(
+      dynamic_modal(
+        title = input_values$desc[which(input_values$name == "5C_1")],
+        name = "5C_1",
+        inputs = input_values$value[which(input_values$name == "5C_1")],
+        helps = input_values$tooltip[which(input_values$name == "5C_1")],
+        ok = "Add Value",
+        size = "xl"
+      )
+    )
+  })
+  
+  observeEvent(input$modal_ok_5C_1, {
+    get_input_inds <- names(input)[grep("modal_5C_1", names(input))]
+    output_tables$table_5C_1 <- rbind(output_tables$table_5C_1, sapply(get_input_inds, function(x) input[[x]]))
+    colnames(output_tables$table_5C_1) <- unlist(strsplit(input_values$value[which(input_values$name == "5C_1")], split = ";"))
+    output$table_5C_1 <- DT::renderDT(output_tables$table_5C_1, 
+                                      selection = 'single',
+                                      options = list(paging = FALSE, dom = 't', ordering = FALSE), width = '50%')
+    removeModal()
+  })
+  
+  observeEvent(input$remove_5C_1, {
+    if (nrow(output_tables$table_5C_1) == 1) {
+      output_tables$table_5C_1 <- data.frame()
+    }
+    if (nrow(output_tables$table_5C_1) > 1) {
+      output_tables$table_5C_1 <- output_tables$table_5C_1[-input$table_5C_1_rows_selected,,drop = FALSE]
+    }
+  })
+  
+  #5C_1 -- modal end
+  
+  #6A_1 -- modal start
+  
+  observeEvent(input$add_6A_1, {
+    showModal(
+      dynamic_modal(
+        title = input_values$desc[which(input_values$name == "6A_1")],
+        name = "6A_1",
+        inputs = input_values$value[which(input_values$name == "6A_1")],
+        helps = input_values$tooltip[which(input_values$name == "6A_1")],
+        ok = "Add Value",
+        size = "xl"
+      )
+    )
+  })
+  
+  observeEvent(input$modal_ok_6A_1, {
+    get_input_inds <- names(input)[grep("modal_6A_1", names(input))]
+    output_tables$table_6A_1 <- rbind(output_tables$table_6A_1, sapply(get_input_inds, function(x) input[[x]]))
+    colnames(output_tables$table_6A_1) <- unlist(strsplit(input_values$value[which(input_values$name == "6A_1")], split = ";"))
+    output$table_6A_1 <- DT::renderDT(output_tables$table_6A_1, 
+                                      selection = 'single',
+                                      options = list(paging = FALSE, dom = 't', ordering = FALSE), width = '50%')
+    removeModal()
+  })
+  
+  observeEvent(input$remove_6A_1, {
+    if (nrow(output_tables$table_6A_1) == 1) {
+      output_tables$table_6A_1 <- data.frame()
+    }
+    if (nrow(output_tables$table_6A_1) > 1) {
+      output_tables$table_6A_1 <- output_tables$table_6A_1[-input$table_6A_1_rows_selected,,drop = FALSE]
+    }
+  })
+  
+  #6A_1 -- modal end
+  
+  # for (k in 1:nrow(input_values)) {
+  #   observeEvent(input[[input_values$name[k]]], {
+  #     reacts$input_scores$values[which(reacts$input_scores$names == input_values$name[k])] <- 1
+  #     
+  #   })
+  # }
+  # 
+  # reactive({
+  #   output$progress <- renderHTML(paste0("You have completed ", sum(reacts$input_scores$values, na.rm = TRUE)/length(reacts$input_scores$values), " %"))
+  # })
+  
+})
+
+# Run the application 
+shinyApp(ui = ui, server = server)
